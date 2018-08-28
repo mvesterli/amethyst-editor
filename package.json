@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "David LeGare <dlegare.1001@gmail.com> (https://twitter.com/randomPoison)",
   "license": "MIT",
+  "dependencies": {
+    "node-ipc": "^9.1.1"
+  },
   "devDependencies": {
     "electron": "^2.0.8"
   }

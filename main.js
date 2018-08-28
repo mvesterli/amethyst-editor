@@ -1,5 +1,8 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron');
+const childProcess = require('child_process');
+const path = require('path');
+const ipc = require('node-ipc');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -48,3 +51,33 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipc.config.id   = 'world';
+ipc.config.retry= 1500;
+
+ipc.serveNet(
+    'udp4',
+    function(){
+        console.log(123);
+        ipc.server.on(
+            'message',
+            function(data,socket){
+                ipc.log('got a message from '.debug, data.from.variable ,' : '.debug, data.message.variable);
+                ipc.server.emit(
+                    socket,
+                    'message',
+                    {
+                        from    : ipc.config.id,
+                        message : data.message+' world!'
+                    }
+                );
+            }
+        );
+    }
+);
+
+ipc.server.start();
+
+// Spawn a child process for the client for to test IPC communication.
+let program = path.resolve('client.js');
+childProcess.fork(program);
