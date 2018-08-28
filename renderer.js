@@ -5,6 +5,7 @@
 let app = new Vue({
     el: '#app',
     data: {
-        process: process
+        process: process,
+        entities: [],
     }
 });

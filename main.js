@@ -68,12 +68,12 @@ ipc.serveNet(
             'message',
             function(data, socket) {
                 console.log(data);
-                ipc.log('got a message from '.debug, data.from.variable, ' : '.debug, data.message.variable);
+
                 ipc.server.emit(
                     socket,
                     'message', {
                         from: ipc.config.id,
-                        message: 'Hello! You said: ' + data.message
+                        message: 'Hello! You said: ' + data
                     }
                 );
             }
@@ -82,7 +82,3 @@ ipc.serveNet(
 );
 
 ipc.server.start();
-
-// // Spawn a child process for the client for to test IPC communication.
-// let program = path.resolve('client.js');
-// childProcess.fork(program);

@@ -14,6 +14,13 @@
       We are using Node.js {{process.versions.node}},
       Chromium {{process.versions.chrome}},
       and Electron {{process.versions.electron}}.
+
+      <h2>Entities</h2>
+      <ul>
+        <li v-for="entity in entities">
+          {{entity}}
+        </li>
+      </ul>
     </div>
 
     <script>
