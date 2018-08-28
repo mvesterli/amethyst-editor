@@ -3,13 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+    <div id="app">
+      <h1>Hello World!</h1>
+
+      We are using Node.js {{process.versions.node}},
+      Chromium {{process.versions.chrome}},
+      and Electron {{process.versions.electron}}.
+    </div>
 
     <script>
       // You can also require other files to run in this process
