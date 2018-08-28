@@ -1,0 +1,16 @@
+{
+  "name": "amethyst-editor",
+  "version": "0.1.0",
+  "description": "An experimental editor for the Amethyst game engine",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/randomPoison/amethyst-editor",
+  "keywords": [],
+  "author": "David LeGare <dlegare.1001@gmail.com> (https://twitter.com/randomPoison)",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^2.0.8"
+  }
+}
