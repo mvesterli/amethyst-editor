@@ -1,11 +1,14 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// All of the Node.js APIs are available in this process.
+const { ipcRenderer } = require('electron');
 
-let app = new Vue({
+exports.app = new Vue({
     el: '#app',
     data: {
         process: process,
         entities: [],
     }
+});
+
+ipcRenderer.on('message', (event, data) => {
+    console.log('Recieved super cool event', event, data);
+    exports.app.entities = data;
 });

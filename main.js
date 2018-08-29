@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 const {
     app,
-    BrowserWindow
+    BrowserWindow,
 } = require('electron');
 const childProcess = require('child_process');
 const path = require('path');
@@ -67,15 +67,7 @@ ipc.serveNet(
         ipc.server.on(
             'message',
             function(data, socket) {
-                console.log(data);
-
-                ipc.server.emit(
-                    socket,
-                    'message', {
-                        from: ipc.config.id,
-                        message: 'Hello! You said: ' + data
-                    }
-                );
+                mainWindow.webContents.send('message', data);
             }
         );
     }
