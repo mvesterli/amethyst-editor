@@ -67,7 +67,9 @@ ipc.serveNet(
         ipc.server.on(
             'message',
             function(data, socket) {
-                mainWindow.webContents.send('message', data);
+                if (mainWindow !== null) {
+                    mainWindow.webContents.send('message', data);
+                }
             }
         );
     }
