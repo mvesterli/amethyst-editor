@@ -31,7 +31,12 @@
 
         <div v-if="selectedEntity !== null" class="right">
           <div v-if="transforms[selectedEntity] !== undefined">
-            {{ transforms[selectedEntity] }}
+            <h3>Transform</h3>
+            <ul>
+              <li v-for="(value, field) in transforms[selectedEntity]">
+                {{ field }}: {{ value }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
