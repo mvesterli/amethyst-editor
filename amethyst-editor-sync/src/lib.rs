@@ -62,17 +62,16 @@ impl<'a, T> System<'a> for SyncComponentSystem<T> where T: Component + Serialize
         for (entity, transform) in (&*entities, &transforms).join() {
             component_data.push((entity.id(), transform));
         }
+        let serialized_data = serde_json::to_string(&component_data).expect("Failed to serialize message");
 
-        // Create the message and serialize it to JSON.
-        let message = Message {
-            ty: self.name,
-            data: component_data,
-        };
-        let serialized_data = serde_json::to_string(&message).expect("Failed to serialize message");
+        let formatted = format!(
+            "\"{}\":{}",
+            self.name,
+            serialized_data,
+        );
+        println!("{}", formatted);
 
-        // TODO: Stash the serialized data in a resource somewhere or something. Maybe send it
-        // through a channel.
-        self.sender.send(serialized_data);
+        self.sender.send(formatted);
     }
 }
 
@@ -124,7 +123,7 @@ impl<'a> System<'a> for SyncEditorSystem {
                 "type": "message",
                 "data": {{
                     "entities": {},
-                    "components": {}
+                    "components": {{ {} }}
                 }}
             }}"#,
             entity_string,
