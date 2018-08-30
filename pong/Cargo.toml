@@ -6,3 +6,4 @@ authors = ["David LeGare <dlegare.1001@gmail.com>"]
 [dependencies]
 amethyst = { version = "0.8" }
 amethyst-editor-sync = { path = "../amethyst-editor-sync" }
+serde = { version = "1.0", features = ["derive"] }

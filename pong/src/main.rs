@@ -2,12 +2,15 @@
 
 extern crate amethyst;
 extern crate amethyst_editor_sync;
+#[macro_use]
+extern crate serde;
 
 mod audio;
 mod bundle;
 mod pong;
 mod systems;
 
+use amethyst::core::Transform;
 use amethyst::audio::AudioBundle;
 use amethyst::core::frame_limiter::FrameRateLimitStrategy;
 use amethyst::core::transform::TransformBundle;
@@ -21,7 +24,7 @@ use audio::Music;
 use bundle::PongBundle;
 use std::str;
 use std::time::Duration;
-use amethyst_editor_sync::SyncEditorSystem;
+use amethyst_editor_sync::*;
 
 const ARENA_HEIGHT: f32 = 100.0;
 const ARENA_WIDTH: f32 = 100.0;
@@ -76,6 +79,8 @@ fn main() -> amethyst::Result<()> {
 
     let assets_dir = format!("{}/assets/", env!("CARGO_MANIFEST_DIR"));
 
+    let editor_system = SyncEditorSystem::new();
+
     let game_data = GameDataBuilder::default()
         .with_bundle(
             InputBundle::<String, String>::new().with_bindings_from_file(&key_bindings_path)?,
@@ -85,7 +90,11 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new().with_dep(&["ball_system", "paddle_system"]))?
         .with_bundle(AudioBundle::new(|music: &mut Music| music.music.next()))?
         .with_bundle(UiBundle::<String, String>::new())?
-        .with_thread_local(SyncEditorSystem);
+        .with_barrier()
+        .with(SyncComponentSystem::<Transform>::new("Transform", &editor_system), "editor_transform", &[])
+        .with(SyncComponentSystem::<Ball>::new("Ball", &editor_system), "editor_ball", &[])
+        .with(SyncComponentSystem::<Paddle>::new("Paddle", &editor_system), "editor_paddle", &[])
+        .with_thread_local(editor_system);
     let mut game = Application::build(assets_dir, Pong)?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
@@ -96,6 +105,7 @@ fn main() -> amethyst::Result<()> {
     Ok(())
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Ball {
     pub velocity: [f32; 2],
     pub radius: f32,
@@ -105,12 +115,13 @@ impl Component for Ball {
     type Storage = DenseVecStorage<Self>;
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Serialize, Deserialize)]
 pub enum Side {
     Left,
     Right,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Paddle {
     pub velocity: f32,
     pub side: Side,
@@ -133,7 +144,7 @@ impl Component for Paddle {
     type Storage = DenseVecStorage<Self>;
 }
 
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct ScoreBoard {
     score_left: i32,
     score_right: i32,
