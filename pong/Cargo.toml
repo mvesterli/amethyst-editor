@@ -5,4 +5,4 @@ authors = ["David LeGare <dlegare.1001@gmail.com>"]
 
 [dependencies]
 amethyst = { version = "0.8" }
-amethyst-editor-sync = { path = "../editor-sync" }
+amethyst-editor-sync = { path = "../amethyst-editor-sync" }

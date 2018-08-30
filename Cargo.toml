@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "editor-sync",
+    "amethyst-editor-sync",
     "pong",
 ]
 
