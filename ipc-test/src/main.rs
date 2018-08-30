@@ -1,7 +1,153 @@
+//! TODO: Rewrite for new renderer.
+
 extern crate amethyst;
 #[macro_use]
 extern crate serde;
 extern crate serde_json;
+
+mod audio;
+mod bundle;
+mod pong;
+mod systems;
+
+use amethyst::audio::AudioBundle;
+use amethyst::core::frame_limiter::FrameRateLimitStrategy;
+use amethyst::core::transform::TransformBundle;
+use amethyst::ecs::prelude::{Component, DenseVecStorage};
+use amethyst::input::InputBundle;
+use amethyst::prelude::*;
+use amethyst::renderer::{DisplayConfig, DrawSprite, Pipeline, RenderBundle, Stage};
+use amethyst::ui::{DrawUi, UiBundle};
+
+use audio::Music;
+use bundle::PongBundle;
+use std::time::Duration;
+use systems::SyncEditorSystem;
+
+const ARENA_HEIGHT: f32 = 100.0;
+const ARENA_WIDTH: f32 = 100.0;
+const PADDLE_HEIGHT: f32 = 16.0;
+const PADDLE_WIDTH: f32 = 4.0;
+const PADDLE_VELOCITY: f32 = 75.0;
+
+const BALL_VELOCITY_X: f32 = 75.0;
+const BALL_VELOCITY_Y: f32 = 50.0;
+const BALL_RADIUS: f32 = 2.0;
+
+const SPRITESHEET_SIZE: (f32, f32) = (8.0, 16.0);
+
+const AUDIO_MUSIC: &'static [&'static str] = &[
+    "audio/Computer_Music_All-Stars_-_Wheres_My_Jetpack.ogg",
+    "audio/Computer_Music_All-Stars_-_Albatross_v2.ogg",
+];
+const AUDIO_BOUNCE: &'static str = "audio/bounce.ogg";
+const AUDIO_SCORE: &'static str = "audio/score.ogg";
+
+fn main() -> amethyst::Result<()> {
+    amethyst::start_logger(Default::default());
+
+    use pong::Pong;
+
+    let display_config_path = format!(
+        "{}/resources/display.ron",
+        env!("CARGO_MANIFEST_DIR")
+    );
+    let config = DisplayConfig::load(&display_config_path);
+
+    let pipe = Pipeline::build().with_stage(
+        Stage::with_backbuffer()
+            .clear_target([0.0, 0.0, 0.0, 1.0], 1.0)
+            .with_pass(DrawSprite::new())
+            .with_pass(DrawUi::new()),
+    );
+
+    let key_bindings_path = {
+        if cfg!(feature = "sdl_controller") {
+            format!(
+                "{}/resources/input_controller.ron",
+                env!("CARGO_MANIFEST_DIR")
+            )
+        } else {
+            format!(
+                "{}/resources/input.ron",
+                env!("CARGO_MANIFEST_DIR")
+            )
+        }
+    };
+
+    let assets_dir = format!("{}/assets/", env!("CARGO_MANIFEST_DIR"));
+
+    let game_data = GameDataBuilder::default()
+        .with_bundle(
+            InputBundle::<String, String>::new().with_bindings_from_file(&key_bindings_path)?,
+        )?
+        .with_bundle(PongBundle)?
+        .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
+        .with_bundle(TransformBundle::new().with_dep(&["ball_system", "paddle_system"]))?
+        .with_bundle(AudioBundle::new(|music: &mut Music| music.music.next()))?
+        .with_bundle(UiBundle::<String, String>::new())?
+        .with_thread_local(SyncEditorSystem);
+    let mut game = Application::build(assets_dir, Pong)?
+        .with_frame_limit(
+            FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
+            144,
+        )
+        .build(game_data)?;
+    game.run();
+    Ok(())
+}
+
+pub struct Ball {
+    pub velocity: [f32; 2],
+    pub radius: f32,
+}
+
+impl Component for Ball {
+    type Storage = DenseVecStorage<Self>;
+}
+
+#[derive(PartialEq, Eq)]
+pub enum Side {
+    Left,
+    Right,
+}
+
+pub struct Paddle {
+    pub velocity: f32,
+    pub side: Side,
+    pub width: f32,
+    pub height: f32,
+}
+
+impl Paddle {
+    pub fn new(side: Side) -> Paddle {
+        Paddle {
+            velocity: 1.0,
+            side: side,
+            width: 1.0,
+            height: 1.0,
+        }
+    }
+}
+
+impl Component for Paddle {
+    type Storage = DenseVecStorage<Self>;
+}
+
+#[derive(Default)]
+pub struct ScoreBoard {
+    score_left: i32,
+    score_right: i32,
+}
+
+impl ScoreBoard {
+    pub fn new() -> ScoreBoard {
+        ScoreBoard {
+            score_left: 0,
+            score_right: 0,
+        }
+    }
+}
 
 use amethyst::ecs::*;
 use std::net::UdpSocket;
@@ -18,51 +164,4 @@ struct Message<T> {
     #[serde(rename = "type")]
     ty: &'static str,
     data: T,
-}
-
-fn main() {
-    let socket = UdpSocket::bind("127.0.0.1:8001").expect("Failed to bind socket");
-    socket.connect("127.0.0.1:8000").expect("Failed to connect to editor");
-
-    // Create some entities in the world.
-    let mut world = World::new();
-    for _ in 0..10 {
-        world.create_entity().build();
-    }
-    world.maintain();
-
-    // Create a list of the entities in the world.
-    let entity_data = {
-        let entities = world.entities();
-        let mut result = Vec::new();
-        for (entity,) in (&*entities,).join() {
-            result.push(EntityData {
-                id: entity.id(),
-                generation: entity.gen().id(),
-            });
-        }
-        result
-    };
-
-    // Create the message and serialize it to JSON.
-    let message = Message {
-        ty: "message",
-        data: entity_data,
-    };
-    let mut message_string = serde_json::to_string(&message).expect("Failed to serialize message");
-
-    // NOTE: We need to append a page feed character after each message since that's what node-ipc
-    // expects to delimit messages.
-    message_string.push_str("\u{C}");
-
-    // Send the JSON message.
-    socket.send(message_string.as_bytes()).expect("Failed to send message");
-
-    let mut buffer = [0; 2048];
-    loop {
-        let bytes_read = socket.recv(&mut buffer).expect("Failed to recieve bytes");
-        let message_bytes = &buffer[..bytes_read];
-        let message = str::from_utf8(message_bytes).expect("Message was invalid UTF-8");
-        println!("{}", message.trim());
-    }
 }

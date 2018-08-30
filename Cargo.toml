@@ -2,3 +2,6 @@
 members = [
     "ipc-test"
 ]
+
+[patch.crates-io]
+amethyst = { git = "https://github.com/amethyst/amethyst", branch = "develop", rev = "7938002d5ec36d4f9fde7d2436756db265a510a7" }
