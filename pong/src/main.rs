@@ -1,9 +1,7 @@
 //! TODO: Rewrite for new renderer.
 
 extern crate amethyst;
-#[macro_use]
-extern crate serde;
-extern crate serde_json;
+extern crate amethyst_editor_sync;
 
 mod audio;
 mod bundle;
@@ -23,7 +21,7 @@ use audio::Music;
 use bundle::PongBundle;
 use std::str;
 use std::time::Duration;
-use systems::SyncEditorSystem;
+use amethyst_editor_sync::SyncEditorSystem;
 
 const ARENA_HEIGHT: f32 = 100.0;
 const ARENA_WIDTH: f32 = 100.0;
@@ -148,17 +146,4 @@ impl ScoreBoard {
             score_right: 0,
         }
     }
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-struct EntityData {
-    id: u32,
-    generation: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Message<T> {
-    #[serde(rename = "type")]
-    ty: &'static str,
-    data: T,
 }

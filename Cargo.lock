@@ -46,6 +46,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "amethyst-editor-sync"
+version = "0.1.0"
+dependencies = [
+ "amethyst 0.8.0 (git+https://github.com/amethyst/amethyst?branch=develop)",
+ "serde 1.0.75 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.26 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "amethyst_animation"
 version = "0.3.0"
 source = "git+https://github.com/amethyst/amethyst?branch=develop#7938002d5ec36d4f9fde7d2436756db265a510a7"
@@ -924,8 +933,7 @@ name = "ipc-test"
 version = "0.1.0"
 dependencies = [
  "amethyst 0.8.0 (git+https://github.com/amethyst/amethyst?branch=develop)",
- "serde 1.0.75 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.26 (registry+https://github.com/rust-lang/crates.io-index)",
+ "amethyst-editor-sync 0.1.0",
 ]
 
 [[package]]

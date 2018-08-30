@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "ipc-test"
+    "editor-sync",
+    "pong",
 ]
 
 [patch.crates-io]
