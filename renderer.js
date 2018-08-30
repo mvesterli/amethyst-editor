@@ -6,6 +6,13 @@ exports.app = new Vue({
         process: process,
         entities: [],
         transforms: {},
+        selectedEntity: null,
+    },
+    methods: {
+        selectEntity: function(entity) {
+            console.log('selected entity', entity);
+            this.selectedEntity = entity;
+        }
     }
 });
 

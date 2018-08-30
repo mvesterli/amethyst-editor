@@ -1,0 +1,15 @@
+.root {
+    display: flex;
+}
+
+.left {
+    width: 400px;
+}
+
+.right {
+    flex-grow: 1;
+}
+
+.entities__entity--selected {
+    color: red;
+}
