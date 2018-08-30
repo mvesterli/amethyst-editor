@@ -5,10 +5,16 @@ exports.app = new Vue({
     data: {
         process: process,
         entities: [],
+        transforms: {},
     }
 });
 
 ipcRenderer.on('message', (event, data) => {
-    console.log('Recieved super cool event', event, data);
-    exports.app.entities = data;
+    exports.app.entities = data.entities;
+
+    let transforms = {};
+    for (let [entityId, transform] of data.transforms) {
+        transforms['' + entityId] = transform;
+    }
+    exports.app.transforms = transforms;
 });
