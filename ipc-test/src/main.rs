@@ -21,6 +21,7 @@ use amethyst::ui::{DrawUi, UiBundle};
 
 use audio::Music;
 use bundle::PongBundle;
+use std::str;
 use std::time::Duration;
 use systems::SyncEditorSystem;
 
@@ -148,10 +149,6 @@ impl ScoreBoard {
         }
     }
 }
-
-use amethyst::ecs::*;
-use std::net::UdpSocket;
-use std::str;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 struct EntityData {
