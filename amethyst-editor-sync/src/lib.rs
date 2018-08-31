@@ -8,6 +8,8 @@ use serde::export::PhantomData;
 extern crate amethyst;
 extern crate crossbeam_channel;
 #[macro_use]
+extern crate log;
+#[macro_use]
 extern crate serde;
 extern crate serde_json;
 
@@ -69,7 +71,7 @@ impl<'a, T> System<'a> for SyncComponentSystem<T> where T: Component + Serialize
             self.name,
             serialized_data,
         );
-        println!("{}", formatted);
+        trace!("{}", formatted);
 
         self.sender.send(formatted);
     }
@@ -130,7 +132,7 @@ impl<'a> System<'a> for SyncEditorSystem {
             all_components,
         );
 
-        println!("{}", message_string);
+        trace!("{}", message_string);
 
         // NOTE: We need to append a page feed character after each message since that's what node-ipc
         // expects to delimit messages.
