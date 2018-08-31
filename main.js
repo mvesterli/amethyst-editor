@@ -60,6 +60,7 @@ app.on('activate', function() {
 
 ipc.config.id = 'world';
 ipc.config.retry = 1500;
+ipc.config.silent = true;
 
 ipc.serveNet(
     'udp4',
