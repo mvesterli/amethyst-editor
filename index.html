@@ -2,43 +2,40 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello World!</title>
 
-    <link href="editor.css" rel="stylesheet">
+    <!-- Use Bulma for CSS -->
+    <link href="node_modules/bulma/css/bulma.css" rel="stylesheet">
 
     <!-- development version, includes helpful console warnings -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   </head>
   <body>
-    <div id="app">
-      <h1>Hello Amethyst!</h1>
+    <div id="app" class="section columns">
+      <div class="column is-one-fifth">
+        <nav class="panel">
+          <h2 class="panel-heading">Entities</h2>
+            <a
+              v-for="entity in entities"
+              v-bind:class="{ 'is-active': entity.id === selectedEntity }"
+              v-on:click="selectEntity(entity.id)"
+              class="panel-block"
+            >
+              {{ entity.id }}
+            </a>
+        </nav>
+      </div>
 
-      <div class="root">
-        <div class="left">
-          <div class="entities">
-            <h2>Entities</h2>
-            <ul>
-              <li
-                v-for="entity in entities"
-                v-bind:class="{ 'entities__entity--selected': entity.id === selectedEntity }"
-                class="entities__entity"
-              >
-                <button v-on:click="selectEntity(entity.id)">{{ entity.id }}</button>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div v-if="selectedEntity !== null" class="right">
-          <ul v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined">
-            <h3>{{ componentType.type }}</h3>
-            <ul>
-              <li v-for="(value, field) in componentType.data[selectedEntity]">
-                {{ field }}: {{ value }}
-              </li>
-            </ul>
+      <div v-if="selectedEntity !== null" class="column">
+        <ul v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
+          <h3 class="title is-3">{{ componentType.type }}</h3>
+          <ul>
+            <li v-for="(value, field) in componentType.data[selectedEntity]" class="level">
+              {{ field }}: {{ value }}
+            </li>
           </ul>
-        </div>
+        </ul>
       </div>
 
     </div>

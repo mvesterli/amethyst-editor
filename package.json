@@ -11,6 +11,7 @@
   "author": "David LeGare <dlegare.1001@gmail.com> (https://twitter.com/randomPoison)",
   "license": "MIT",
   "dependencies": {
+    "bulma": "^0.7.1",
     "node-ipc": "^9.1.1"
   },
   "devDependencies": {
