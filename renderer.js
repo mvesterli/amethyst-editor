@@ -12,7 +12,6 @@ let app = new Vue({
     },
     methods: {
         selectEntity: function(entity) {
-            console.log('selected entity', entity);
             this.selectedEntity = entity;
         }
     }
