@@ -6,6 +6,7 @@ let app = new Vue({
         process: process,
         entities: [],
         components: [],
+        resources: [],
         rawComponents: null,
         selectedEntity: null,
     },
@@ -20,22 +21,6 @@ exports.app = app;
 
 ipcRenderer.on('message', (event, data) => {
     app.entities = data.entities;
-    app.rawComponents = data.components;
-
-    // Convert the list of [key, value] pairs into maps that we can use to
-    // quickly lookup which components are associated with which entities.
-    //
-    // TODO: Could we have Rust send the data directly in the format we want?
-    let components = [];
-    for (let [type, flatData] of Object.entries(data.components)) {
-        let lookup = {};
-        for (let [entity, componentData] of flatData) {
-            lookup[entity] = componentData;
-        }
-        components.push({
-            type: type,
-            data: lookup,
-        });
-    }
-    app.components = components;
+    app.components = data.components;
+    app.resources = data.resources;
 });

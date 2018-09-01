@@ -28,14 +28,25 @@
       </div>
 
       <div v-if="selectedEntity !== null" class="column">
-        <ul v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
-          <h3 class="title is-3">{{ componentType.type }}</h3>
+        <div v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
+          <h3 class="title is-3">{{ componentType.name }}</h3>
           <ul>
             <li v-for="(value, field) in componentType.data[selectedEntity]" class="level">
               {{ field }}: {{ value }}
             </li>
           </ul>
-        </ul>
+        </div>
+      </div>
+
+      <div v-if="resources.length > 0" class="column">
+        <div v-for="resource in resources" class="box content">
+          <h3 class="title is-3">{{ resource.name }}</h3>
+          <ul>
+            <li v-for="(value, field) in resource.data" class="level">
+              {{ field }}: {{ value }}
+            </li>
+          </ul>
+        </div>
       </div>
 
     </div>

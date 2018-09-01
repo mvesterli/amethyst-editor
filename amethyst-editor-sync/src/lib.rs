@@ -1,9 +1,10 @@
-use crossbeam_channel::Receiver;
-use crossbeam_channel::Sender;
-use std::net::UdpSocket;
-use serde::Serialize;
+use std::collections::HashMap;
 use amethyst::ecs::*;
+use amethyst::shred::Resource;
+use crossbeam_channel::{Receiver, Sender};
+use serde::Serialize;
 use serde::export::PhantomData;
+use std::net::UdpSocket;
 
 extern crate amethyst;
 extern crate crossbeam_channel;
@@ -26,10 +27,27 @@ struct Message<T> {
     data: T,
 }
 
+enum SerializedData {
+    Resource(String),
+    Component(String),
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+struct SerializedComponent<'a, T: 'a> {
+    name: &'static str,
+    data: HashMap<u32, &'a T>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SerializedResource<'a, T: 'a> {
+    name: &'static str,
+    data: &'a T,
+}
+
 #[derive(Debug, Clone)]
 pub struct SyncComponentSystem<T> {
     name: &'static str,
-    sender: Sender<String>,
+    sender: Sender<SerializedData>,
     _marker: PhantomData<T>,
 }
 
@@ -60,27 +78,46 @@ impl<'a, T> System<'a> for SyncComponentSystem<T> where T: Component + Serialize
             });
         }
 
-        let mut component_data = Vec::new();
+        let mut component_data = HashMap::new();
         for (entity, transform) in (&*entities, &transforms).join() {
-            component_data.push((entity.id(), transform));
+            component_data.insert(entity.id(), transform);
         }
-        let serialized_data = serde_json::to_string(&component_data).expect("Failed to serialize message");
+        let serialized = serde_json::to_string(&SerializedComponent { name: self.name, data: component_data }).expect("Failed to serialize message");
 
-        let formatted = format!(
-            "\"{}\":{}",
-            self.name,
-            serialized_data,
-        );
-        trace!("{}", formatted);
+        self.sender.send(SerializedData::Component(serialized));
+    }
+}
 
-        self.sender.send(formatted);
+#[derive(Debug, Clone)]
+pub struct SyncResourceSystem<T> {
+    name: &'static str,
+    sender: Sender<SerializedData>,
+    _marker: PhantomData<T>,
+}
+
+impl<T> SyncResourceSystem<T> {
+    pub fn new(name: &'static str, send_to: &SyncEditorSystem) -> Self {
+        SyncResourceSystem {
+            name,
+            sender: send_to.sender.clone(),
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<'a, T> System<'a> for SyncResourceSystem<T> where T: Resource + Serialize {
+    type SystemData = ReadExpect<'a, T>;
+
+    fn run(&mut self, data: Self::SystemData) {
+        let serialized = serde_json::to_string(&SerializedResource { name: self.name, data: &*data }).expect("Failed to serialize resource");
+        self.sender.send(SerializedData::Resource(serialized));
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct SyncEditorSystem {
-    sender: Sender<String>,
-    receiver: Receiver<String>,
+    sender: Sender<SerializedData>,
+    receiver: Receiver<SerializedData>,
 }
 
 impl SyncEditorSystem {
@@ -100,14 +137,30 @@ impl<'a> System<'a> for SyncEditorSystem {
     fn run(&mut self, data: Self::SystemData) {
         let (socket, entities) = data;
 
-        let mut all_components = String::new();
-        if let Some(component) = self.receiver.try_recv() {
-            all_components = component;
-        }
+        let mut components_string = String::new();
+        let mut resources_string = String::new();
+        while let Some(serialized) = self.receiver.try_recv() {
+            match serialized {
+                SerializedData::Component(component) => {
+                    // Insert a comma between each component so that it's valid JSON.
+                    if components_string.len() > 0 {
+                        components_string.push(',');
+                    }
 
-        while let Some(component_string) = self.receiver.try_recv() {
-            all_components.push(',');
-            all_components.push_str(&component_string);
+                    // Add the component to the JSON chunk for components.
+                    components_string.push_str(&component);
+                }
+
+                SerializedData::Resource(resource) => {
+                    // Insert a comma between each resource so that it's valid JSON.
+                    if resources_string.len() > 0 {
+                        resources_string.push(',');
+                    }
+
+                    // Add the resource to the JSON chunk for resources.
+                    resources_string.push_str(&resource);
+                }
+            }
         }
 
         let mut entity_data = Vec::new();
@@ -125,11 +178,13 @@ impl<'a> System<'a> for SyncEditorSystem {
                 "type": "message",
                 "data": {{
                     "entities": {},
-                    "components": {{ {} }}
+                    "components": [{}],
+                    "resources": [{}]
                 }}
             }}"#,
             entity_string,
-            all_components,
+            components_string,
+            resources_string,
         );
 
         trace!("{}", message_string);

@@ -1,6 +1,7 @@
 //! TODO: Rewrite for new renderer.
 
 extern crate amethyst;
+extern crate env_logger;
 extern crate amethyst_editor_sync;
 #[macro_use]
 extern crate serde;
@@ -46,7 +47,7 @@ const AUDIO_BOUNCE: &'static str = "audio/bounce.ogg";
 const AUDIO_SCORE: &'static str = "audio/score.ogg";
 
 fn main() -> amethyst::Result<()> {
-    amethyst::start_logger(Default::default());
+    env_logger::init();
 
     use pong::Pong;
 
@@ -94,6 +95,7 @@ fn main() -> amethyst::Result<()> {
         .with(SyncComponentSystem::<Transform>::new("Transform", &editor_system), "editor_transform", &[])
         .with(SyncComponentSystem::<Ball>::new("Ball", &editor_system), "editor_ball", &[])
         .with(SyncComponentSystem::<Paddle>::new("Paddle", &editor_system), "editor_paddle", &[])
+        .with(SyncResourceSystem::<ScoreBoard>::new("ScoreBoard", &editor_system), "editor_score_board", &[])
         .with_thread_local(editor_system);
     let mut game = Application::build(assets_dir, Pong)?
         .with_frame_limit(
@@ -105,7 +107,7 @@ fn main() -> amethyst::Result<()> {
     Ok(())
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Ball {
     pub velocity: [f32; 2],
     pub radius: f32,
@@ -115,13 +117,13 @@ impl Component for Ball {
     type Storage = DenseVecStorage<Self>;
 }
 
-#[derive(PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Side {
     Left,
     Right,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Paddle {
     pub velocity: f32,
     pub side: Side,
@@ -144,7 +146,7 @@ impl Component for Paddle {
     type Storage = DenseVecStorage<Self>;
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ScoreBoard {
     score_left: i32,
     score_right: i32,
