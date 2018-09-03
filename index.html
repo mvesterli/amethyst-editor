@@ -22,7 +22,17 @@
               v-on:click="selectEntity(entity.id)"
               class="panel-block"
             >
-              {{ entity.id }}
+              <span class="panel-icon">{{ entity.id }}</span>
+
+              <div class="tags">
+                <span
+                  v-for="component in components"
+                  v-if="component.data[entity.id] !== undefined"
+                  class="tag is-primary"
+                >
+                  {{ component.name }}
+                </span>
+              </div>
             </a>
         </nav>
       </div>
@@ -48,7 +58,6 @@
           </ul>
         </div>
       </div>
-
     </div>
 
     <script>
