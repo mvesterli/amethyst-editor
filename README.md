@@ -3,6 +3,8 @@
 [![Join us on Discord](https://img.shields.io/discord/425678876929163284.svg?logo=discord)](https://discord.gg/GnP5Whs)
 [![MIT/Apache](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](COPYING.txt)
 
+![An example of the editor running the Pong example game.](screenshots/pong.gif)
+
 An experimental editor/visualizer/debugger for the [Amethyst] game engine, built using [Electron].
 The goal is to experiment test the viability of using web technologies (specifically HTML5, CSS,
 and WebAssembly) to create a powerful, configurable editor that is easily to edit and modify.
@@ -29,6 +31,7 @@ Additional goals for prototyping:
   to cause a hang or an error in the editor from game code.
 * Visual customizations through custom CSS themes.
 * Extensions/plugins written in JavaScript or Rust (via WebAssembly).
+* Embed Amethyst directly in the editor in order to preview assets.
 
 ## Status
 
@@ -50,11 +53,16 @@ data to HTML templates.
 
 ## Roadmap/Wishlist
 
+The following are all things that we would like to add to the project. If you have ideas for how
+to make these happen, or would like to make contributions, feel free to open an issue or pull
+request!
+
 * Application logic written in Rust, likely with [Yew].
 * The ability to edit the state of the world (add/remove entities, add/remove/edit components,
   edit resources).
 * The ability to create/edit prefabs.
 * Preview assets (meshes, textures, prefabs, etc.) in the editor.
+* View systems and information about ordering/dependencies and which entities they currently act on.
 
 [Amethyst]: https://www.amethyst.rs/
 [Electron]: https://electronjs.org/
