@@ -6,12 +6,25 @@
 ![An example of the editor running the Pong example game.](screenshots/pong.gif)
 
 An experimental editor/visualizer/debugger for the [Amethyst] game engine, built using [Electron].
-The goal is to experiment test the viability of using web technologies (specifically HTML5, CSS,
-and WebAssembly) to create a powerful, configurable editor that is easily to edit and modify.
+The goal is to experiment with and test the viability of using web technologies (specifically HTML5,
+CSS, and WebAssembly) to create a powerful, configurable editor that is easy to edit and modify.
 
-## Setup
+## Setup and Usage
 
-Use the [amethyst-editor-sync] crate to add support for visualizing your game's state in the editor.
+Use the [amethyst-editor-sync] crate to add support for visualizing your  game's state in the
+editor. Note that you'll need to manually setup each component and resource that you want to be able
+to visualize in the editor.
+
+Once your game is setup using [amethyst-editor-sync], you can simply run the game alongside the
+editor and the editor will automatically begin displaying your game's state. On the left is the list
+of entities, including the components attached to each entity. Clicking on an entity will show the
+data for each of the components attached to the entity. On the right you can also see the data for
+all resources.
+
+> NOTE: Running more than one instance of the editor or more than one game with editor support is
+> not currently supported. Doing so will causes errors/crashes in the editor, and you will not be
+> able to use multiple editor instances to debug multiple games at once. This functionality may
+> still be added though, see the issue tracker if you'd like to request this feature.
 
 ## Motivation and Philosophy
 
