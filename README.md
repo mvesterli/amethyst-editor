@@ -3,11 +3,13 @@
 [![Join us on Discord](https://img.shields.io/discord/425678876929163284.svg?logo=discord)](https://discord.gg/GnP5Whs)
 [![MIT/Apache](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](COPYING.txt)
 
-![An example of the editor running the Pong example game.](screenshots/pong.gif)
-
 An experimental editor/visualizer/debugger for the [Amethyst] game engine, built using [Electron].
 The goal is to experiment with and test the viability of using web technologies (specifically HTML5,
-CSS, and WebAssembly) to create a powerful, configurable editor that is easy to edit and modify.
+CSS, and WebAssembly) to create a powerful, configurable editor that is easy to style and modify.
+
+> NOTE: This project is not an official part of the Amethyst project. It is being built in
+> coordination with the Amethyst developers, but the Amethyst core team takes no responsibility
+> for any nonsense happening here.
 
 ## Setup and Usage
 
@@ -15,11 +17,13 @@ Use the [amethyst-editor-sync] crate to add support for visualizing your  game's
 editor. Note that you'll need to manually setup each component and resource that you want to be able
 to visualize in the editor.
 
+![An example of the editor running the Pong example game.](screenshots/pong.gif)
+
 Once your game is setup using [amethyst-editor-sync], you can simply run the game alongside the
 editor and the editor will automatically begin displaying your game's state. On the left is the list
 of entities, including the components attached to each entity. Clicking on an entity will show the
-data for each of the components attached to the entity. On the right you can also see the data for
-all resources.
+data for each of the entity's components in the middle column. The right column displays the list of
+resources and the current state for each one.
 
 > NOTE: Running more than one instance of the editor or more than one game with editor support is
 > not currently supported. Doing so will causes errors/crashes in the editor, and you will not be
@@ -44,7 +48,19 @@ Additional goals for prototyping:
   to cause a hang or an error in the editor from game code.
 * Visual customizations through custom CSS themes.
 * Extensions/plugins written in JavaScript or Rust (via WebAssembly).
-* Embed Amethyst directly in the editor in order to preview assets.
+* Embed Amethyst directly in the editor in order to preview assets and 2D/3D world state.
+
+## Contributing
+
+In order to work on the editor you'll need to have [Node.js] (including NPM) installed on your
+development machine. You'll also need an Amethyst game that is setup to communicate with the editor
+using the [amethyst-editor-sync] crate. If you don't already have a game setup, you can use the pong
+example in [amethyst-editor-sync] by cloning the repo and running `cargo run --example pong`.
+
+For any feature requests, please open an issue in the GitHub issue tracker. Pull requests are also
+greatly appreciated :heart:
+
+All contributors are expected to follow the [Rust Code of Conduct].
 
 ## Status
 
@@ -76,6 +92,12 @@ request!
 * The ability to create/edit prefabs.
 * Preview assets (meshes, textures, prefabs, etc.) in the editor.
 * View systems and information about ordering/dependencies and which entities they currently act on.
+* Send log output to the editor and provide a way to filter and search logs.
+* Better default color scheme and style.
+* Run the editor with dummy data such that you don't need to have an actual game running (or even
+  have Rust installed) to work on the visual components of the editor.
+
+> TODO: Move these to epic tickets in the issue tracker.
 
 [Amethyst]: https://www.amethyst.rs/
 [Electron]: https://electronjs.org/
@@ -83,3 +105,5 @@ request!
 [`Serialize`]: https://docs.rs/serde/1.0.76/serde/trait.Serialize.html
 [Yew]: https://github.com/DenisKolodin/yew
 [Vue.js]: https://vuejs.org/
+[Node.js]: https://nodejs.org/
+[Rust Code of Conduct]: https://www.rust-lang.org/conduct.html
