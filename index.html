@@ -12,43 +12,59 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   </head>
   <body>
-    <div id="app" class="section columns">
-      <div class="column is-one-fifth">
-        <nav class="panel">
-          <h2 class="panel-heading">Entities</h2>
-            <a
-              v-for="entity in entities"
-              v-bind:class="{ 'is-active': entity.id === selectedEntity }"
-              v-on:click="selectEntity(entity.id)"
-              class="panel-block"
-            >
-              <span class="panel-icon">{{ entity.id }}</span>
-
-              <div class="tags">
-                <span
-                  v-for="component in components"
-                  v-if="component.data[entity.id] !== undefined"
-                  class="tag is-primary"
-                >
-                  {{ component.name }}
-                </span>
-              </div>
-            </a>
-        </nav>
+    <div id="app" class="section">
+      <!-- Tabs bar at the top of the page. -->
+      <div class="tabs is-centered">
+        <ul>
+          <li
+            v-for="(tab, index) in tabs"
+            v-bind:class="{ 'is-active': activeTab === index }"
+          >
+            <a v-on:click="selectTab(index)">{{ tab }}</a>
+          </li>
+        </ul>
       </div>
 
-      <div v-if="selectedEntity !== null" class="column">
-        <div v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
-          <h3 class="title is-3">{{ componentType.name }}</h3>
-          <ul>
-            <li v-for="(value, field) in componentType.data[selectedEntity]" class="level">
-              {{ field }}: {{ value }}
-            </li>
-          </ul>
+      <!-- Entities tab. -->
+      <div v-if="activeTab === 0" class="columns">
+        <div class="column is-one-fifth">
+          <nav class="panel">
+            <h2 class="panel-heading">Entities</h2>
+              <a
+                v-for="entity in entities"
+                v-bind:class="{ 'is-active': entity.id === selectedEntity }"
+                v-on:click="selectEntity(entity.id)"
+                class="panel-block"
+              >
+                <span class="panel-icon">{{ entity.id }}</span>
+
+                <div class="tags">
+                  <span
+                    v-for="component in components"
+                    v-if="component.data[entity.id] !== undefined"
+                    class="tag is-primary"
+                  >
+                    {{ component.name }}
+                  </span>
+                </div>
+              </a>
+          </nav>
+        </div>
+
+        <div v-if="selectedEntity !== null" class="column">
+          <div v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
+            <h3 class="title is-3">{{ componentType.name }}</h3>
+            <ul>
+              <li v-for="(value, field) in componentType.data[selectedEntity]">
+                {{ field }}: {{ value }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div v-if="resources.length > 0" class="column">
+      <!-- Resources tab. -->
+      <div v-if="activeTab === 1">
         <div v-for="resource in resources" class="box content">
           <h3 class="title is-3">{{ resource.name }}</h3>
           <ul>

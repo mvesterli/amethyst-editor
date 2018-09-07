@@ -9,10 +9,19 @@ let app = new Vue({
         resources: [],
         rawComponents: null,
         selectedEntity: null,
+        tabs: [
+            'Entities',
+            'Resources',
+        ],
+        activeTab: 0,
     },
     methods: {
         selectEntity: function(entity) {
             this.selectedEntity = entity;
+        },
+
+        selectTab: function(index) {
+            this.activeTab = index;
         }
     }
 });
