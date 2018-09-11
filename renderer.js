@@ -1,7 +1,11 @@
 const { ipcRenderer } = require('electron');
+const VueJsonPretty = require('vue-json-pretty').default;
 
 let app = new Vue({
     el: '#app',
+    components: {
+        VueJsonPretty,
+    },
     data: {
         process: process,
         entities: [],

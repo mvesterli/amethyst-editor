@@ -54,11 +54,9 @@
         <div v-if="selectedEntity !== null" class="column">
           <div v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
             <h3 class="title is-3">{{ componentType.name }}</h3>
-            <ul>
-              <li v-for="(value, field) in componentType.data[selectedEntity]">
-                {{ field }}: {{ value }}
-              </li>
-            </ul>
+              <vue-json-pretty
+                :data="componentType.data[selectedEntity]"
+              ></vue-json-pretty>
           </div>
         </div>
       </div>
@@ -67,11 +65,9 @@
       <div v-if="activeTab === 1">
         <div v-for="resource in resources" class="box content">
           <h3 class="title is-3">{{ resource.name }}</h3>
-          <ul>
-            <li v-for="(value, field) in resource.data" class="level">
-              {{ field }}: {{ value }}
-            </li>
-          </ul>
+          <vue-json-pretty
+            :data="resource"
+          ></vue-json-pretty>
         </div>
       </div>
     </div>
