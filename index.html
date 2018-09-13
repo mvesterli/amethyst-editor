@@ -42,7 +42,11 @@
                   <span
                     v-for="component in components"
                     v-if="component.data[entity.id] !== undefined"
-                    class="tag is-primary"
+                    v-bind:class="{
+                      'is-primary': component.data[entity.id] !== null,
+                      'is-info': component.data[entity.id] === null,
+                    }"
+                    class="tag"
                   >
                     {{ component.name }}
                   </span>
@@ -51,8 +55,13 @@
           </nav>
         </div>
 
-        <div v-if="selectedEntity !== null" class="column">
-          <div v-for="componentType in components" v-if="componentType.data[selectedEntity] !== undefined" class="box content">
+        <div v-if="selectedEntity != null" class="column">
+          <div class="tags">
+            <div v-for="componentType in components" v-if="componentType.data[selectedEntity] === null" class="tag is-info is-large">
+              {{ componentType.name }}
+            </div>
+          </div>
+          <div v-for="componentType in components" v-if="componentType.data[selectedEntity] != null" class="box content">
             <h3 class="title is-3">{{ componentType.name }}</h3>
               <vue-json-pretty
                 :data="componentType.data[selectedEntity]"
