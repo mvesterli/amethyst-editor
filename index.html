@@ -75,7 +75,7 @@
         <div v-for="resource in resources" class="box content">
           <h3 class="title is-3">{{ resource.name }}</h3>
           <vue-json-pretty
-            :data="resource"
+            :data="resource.data"
           ></vue-json-pretty>
         </div>
       </div>
