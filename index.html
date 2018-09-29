@@ -119,6 +119,13 @@
             <vue-json-pretty :data="resource.data"></vue-json-pretty>
           </div>
         </div>
+
+        <!-- Log tab. -->
+        <div v-if="activeGame().activeTab === 2">
+          <div v-for="log in activeGame().logs">
+            [{{ log.level }}] [{{ log.target }}] {{ log.message }}
+          </div>
+        </div>
       </section>
     </div>
 

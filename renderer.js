@@ -3,6 +3,8 @@ const VueJsonPretty = require('vue-json-pretty').default;
 const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
 const clamp = require('clamp');
 
+const MAX_LOGS = 500;
+
 let app = new Vue({
     el: '#app',
     components: {
@@ -23,6 +25,7 @@ let app = new Vue({
         tabs: [
             'Entities',
             'Resources',
+            'Log',
         ],
     },
 
@@ -87,10 +90,10 @@ ipcRenderer.on('data', (event, data) => {
             entities: [],
             components: [],
             resources: [],
+            logs: [],
             rawComponents: null,
             selectedEntity: null,
             activeTab: 0,
-
             update: function(data) {
                 this.entities = data.entities;
 
@@ -105,7 +108,19 @@ ipcRenderer.on('data', (event, data) => {
                 var sortedResources = data.resources;
                 sortedResources.sort(compareNamed);
                 this.resources = sortedResources;
+
+                for (message of data.messages) {
+                    if (message.type === 'log') {
+                        this.insertLog(message.data);
+                    }
+                }
             },
+            insertLog: function(log) {
+                if (this.logs.length >= MAX_LOGS) {
+                    this.logs.shift();
+                }
+                this.logs.push(log);
+            }
         };
         game.update(data.data);
 
